@@ -1,142 +1,206 @@
-CREATE DATABASE sql_session4;
-USE sql_session4;
+CREATE DATABASE sql_session8;
+USE sql_session8;
 
--- bảng sv
-CREATE TABLE student(
-	stu_id INT AUTO_INCREMENT PRIMARY KEY,
-    stu_fullname VARCHAR(100) NOT NULL,
-    stu_date DATE NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE
 
-);	
-
--- bảng gv 
-CREATE TABLE teacher(
-	teacher_id INT AUTO_INCREMENT PRIMARY KEY,
-    teacher_fullname VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE
-
-);
- 
--- bảng course 
-CREATE TABLE course(
-	course_id INT AUTO_INCREMENT PRIMARY KEY,
-	course_name VARCHAR(100) NOT NULL,
-    desscription TEXT,
-	num_of_lession TINYINT NOT NULL,
-    teacher_id INT,
-    FOREIGN KEY (teacher_id) REFERENCES teacher(teacher_id) ON DELETE CASCADE,
-    UNIQUE(course_id,teacher_id)
+CREATE TABLE customer (
+    customer_id INT PRIMARY KEY AUTO_INCREMENT,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    gender TINYINT,
+    birth_date DATE
 );
 
--- bảng đăng ký 
 
-CREATE TABLE enrollment(
-	enrollment_id INT AUTO_INCREMENT PRIMARY KEY,
-    stu_id INT NOT NULL,
-	course_id INT NOT NULL,
-    date_enrollment DATE DEFAULT(CURRENT_DATE()),
-    FOREIGN KEY (stu_id) REFERENCES student(stu_id) ON DELETE CASCADE,
-    FOREIGN KEY (course_id) REFERENCES course(course_id) ON DELETE CASCADE,
-    UNIQUE(stu_id,course_id)
+CREATE TABLE category (
+    category_id INT PRIMARY KEY AUTO_INCREMENT,
+    category_name VARCHAR(100) NOT NULL
 );
 
--- bảng kết quả
-CREATE TABLE result(
-	result_id INT AUTO_INCREMENT PRIMARY KEY,
-    stu_id INT NOT NULL,
-	course_id INT NOT NULL,
-    midterm FLOAT NOT NULL CHECK(midterm >= 0 AND midterm <= 10 ),
-    end_of_term FLOAT NOT NULL CHECK(end_of_term >= 0 AND end_of_term <= 10 ),
-    UNIQUE(stu_id,course_id),
-    FOREIGN KEY (stu_id) REFERENCES student(stu_id) ON DELETE CASCADE,
-    FOREIGN KEY (course_id) REFERENCES course(course_id) ON DELETE CASCADE
-); 
+CREATE TABLE product (
+    product_id INT PRIMARY KEY AUTO_INCREMENT,
+    product_name VARCHAR(150) NOT NULL,
+    price DECIMAL(10,2),
+    category_id INT,
+    FOREIGN KEY (category_id) REFERENCES category(category_id)
+);
+
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY AUTO_INCREMENT,
+    customer_id INT,
+    order_date DATE DEFAULT (CURRENT_DATE),
+    FOREIGN KEY (customer_id) REFERENCES customer(customer_id)
+);
+CREATE TABLE order_detail(
+	order_detail_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT,
+    product_id INT ,
+    quantity_total INT,
+    total_price INT,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id),
+    FOREIGN KEY (product_id) REFERENCES product(product_id),
+    UNIQUE(order_id, product_id)
+
+);
 
 
--- Nhập dữ liệu ban đầu
--- Thêm ít nhất 5 sinh viên
-INSERT INTO student
-VALUES	(NULL,'Nguyen Van A','2007-01-02','nva@gmail.com'),
-		(NULL,'Tran Thi B','2007-01-02','ttb@gmail.com'),
-		(NULL,'Le Van C','2007-01-02','lvc@gmail.com'),
-        (NULL,'Kieu Thi B','2007-01-02','ktb@gmail.com'),
-        (NULL,'Do Tien Nam','2007-01-02','dtn@gmail.com');
-		
--- Thêm ít nhất 5 giảng viên
-INSERT INTO teacher
-VALUES	(NULL, 'Nguyễn Văn An ','nguyenvanan@example.com'),
-		(NULL, 'Trần Thị Bích ','tranthibich.dev@example.com'),
-        (NULL, 'Lê Hoàng Nam','nam.lehoang@example.com'),
-        (NULL, 'Phạm Quỳnh Hương','huongpham.work@example.com'),
-        (NULL, 'Vũ Đức Minh','vuducminh.contact@example.com');
-        
--- Thêm ít nhất 5 khóa học
-INSERT INTO course
-VALUES	(NULL, 'Lập trình C/C++ nền tảng', 'Cung cấp kiến thức cơ bản về cú pháp, cấu trúc điều khiển và tư duy logic lập trình.', 24, 1),
-		(NULL, 'Thiết kế Web Frontend', 'Hướng dẫn xây dựng giao diện web từ cơ bản đến nâng cao với HTML, CSS (Flexbox, Grid).', 20, 1),
-        (NULL, 'JavaScript và thao tác DOM', 'Tập trung vào xử lý logic hướng đối tượng, các phương thức mảng và tạo hiệu ứng tương tác.', 18, 2),
-        (NULL, 'Cơ sở dữ liệu quan hệ MySQL', 'Học cách thiết kế schema, tạo bảng, viết truy vấn SQL và quản lý khóa ngoại.', 16, 3),
-        (NULL, 'Phát triển phần mềm thực chiến', 'Quy trình xây dựng các dự án quản lý thực tế trong môi trường phát triển phần mềm.', 12, 5);
-		
--- Thêm dữ liệu đăng ký học cho sinh viên
-INSERT INTO enrollment
-VALUES	(NULL,1, 3,'2026-04-04'),
-		(NULL,4, 5,'2026-05-04'),
-        (NULL,2, 3,'2026-04-14'),
-        (NULL,2, 1,'2026-07-10'),
-        (NULL,3, 2,'2026-07-04');
-		
--- Thêm dữ liệu kết quả học tập cho sinh viên
-INSERT INTO result
-VALUES	(NULL, 1, 1,8.9, 9.0),
-		(NULL, 3, 2, 7.5, 8.0);
+INSERT INTO customer (full_name, email, gender, birth_date)
+VALUES
+    ('Nguyễn Văn A', 'nguyenvana@gmail.com', 1, '1995-05-12'),
+    ('Trần Thị B', 'tranthib@gmail.com', 0, '1998-10-25'),
+    ('Lê Hoàng C', 'lehoangc@gmail.com', 1, '1990-02-28'),
+    ('Phạm Mỹ D', 'phammyd@gmail.com', 0, '2001-08-15'),
+    ('Đặng Đình E', 'dangdinhe@gmail.com', 1, '1985-11-03');
 
 
--- Cập nhật dữ liệu
--- Cập nhật email cho một sinh viên
-UPDATE student
-SET email = 'lalala@gmail.com'
-WHERE stu_id = 1;
-
--- Cập nhật mô tả cho một khóa học
-UPDATE course
-SET desscription = 'zxcvbnm,masdfghjklwertyui'
-WHERE course_id = 4;
-		
--- Cập nhật điểm cuối kỳ cho một sinh viên
-UPDATE result
-SET end_of_term = 10
-WHERE stu_id = 1;
-
---  Xóa dữ liệu
--- Xóa một lượt đăng ký học không hợp lệ
-DELETE FROM result
-WHERE result_id = 1;
-
-DELETE FROM student
-WHERE stu_id = 2;
-
--- Truy vấn dữ liệu
--- Lấy danh sách tất cả sinh viên (Student)
-SELECT stu_id, stu_fullname, stu_date, email FROM student;
-
--- Lấy danh sách giảng viên (Teacher)
-SELECT teacher_id, teacher_fullname, email FROM teacher;
-
--- Lấy danh sách các khóa học (Course)
-SELECT course_id, course_name, desscription, num_of_lession, teacher_id FROM course;
-
--- Lấy thông tin các lượt đăng ký khóa học (Enrollment)
-SELECT enrollment_id, stu_id, course_id, date_enrollment FROM enrollment;
-
--- Lấy thông tin các lần đánh giá kết quả (Score)
-SELECT result_id, stu_id, course_id, midterm, end_of_term FROM result;
+INSERT INTO category (category_name)
+VALUES
+    ('Điện thoại di động'),
+    ('Máy tính xách tay'),
+    ('Máy tính bảng'),
+    ('Phụ kiện điện tử'),
+    ('Thiết bị thông minh');
 
 
+INSERT INTO product (product_name, price, category_id)
+VALUES
+    ('iPhone 15 Pro Max', 29990000.00, 1),
+    ('MacBook Pro M3', 39990000.00, 1),
+    ('iPad Air 5', 15490000.00, 3),
+    ('Tai nghe AirPods Pro', 5500000.00, 4),
+    ('Đồng hồ Apple Watch', 9500000.00, 5);
 
 
+INSERT INTO orders (customer_id, order_date)
+VALUES
+    (1, '2026-01-10'),
+    (2, '2026-02-14'),
+    (1, '2026-03-05'), 
+    (3, '2026-03-20'),
+    (4, '2026-04-01');
+
+	
+INSERT INTO order_detail (order_id, product_id, quantity_total, total_price)
+VALUES
+    (1, 1, 1, 29990000),
+    (1, 4, 2, 11000000), 
+    (2, 2, 1, 39990000), 
+    (3, 3, 1, 15490000), 
+    (4, 5, 1, 9500000);  
+    
+    
+-- Cập nhật giá bán cho một sản phẩm.
+UPDATE product
+SET price =	1200000
+WHERE product_id = 1;
+     
+-- Cập nhật email cho một khách hàng.
+UPDATE customer
+SET email =	'abc@gmail.com'
+WHERE customer_id = 1;
+    
+-- Xóa một bản ghi chi tiết đơn hàng không hợp lệ (hoặc một đơn hàng bị hủy).
+DELETE FROM order_detail
+WHERE order_detail_id = 6; 
+
+-- Lấy danh sách khách hàng gồm họ tên, email và sử dụng câu lệnh CASE để hiển thị giới tính dưới dạng văn bản ('Nam' hoặc 'Nữ'). Sử dụng AS để đặt lại tên cột.
+SELECT 
+	full_name,
+    email,
+    CASE 
+		WHEN gender = 1 THEN 'Nam'
+        ELSE 'Nữ'
+	END AS gender
+FROM customer;
+    
+-- Lấy thông tin 3 khách hàng trẻ tuổi nhất: Sử dụng hàm YEAR() và NOW() để tính tuổi, kết hợp mệnh đề ORDER BY và LIMIT.
+SELECT *
+FROM customer
+ORDER BY YEAR(birth_date) DESC 
+LIMIT 3;
+
+-- Hiển thị danh sách tất cả các đơn hàng kèm theo tên khách hàng tương ứng (Sử dụng INNER JOIN).
+SELECT *
+FROM customer c
+INNER JOIN orders o
+ON c.customer_id = o.customer_id;
+
+-- Đếm số lượng sản phẩm theo từng danh mục. Sử dụng GROUP BY và HAVING để chỉ hiển thị các danh mục có từ 2 sản phẩm trở lên.
+SELECT *
+FROM product
+WHERE category_id IN (
+	SELECT category_id
+	FROM product
+	GROUP BY category_id
+	HAVING COUNT(category_id) > 2
+);
+
+-- (Scalar Subquery) Lấy danh sách các sản phẩm có giá lớn hơn giá trị trung bình (AVG) của tất cả các sản phẩm trong cửa hàng.
+SELECT *
+FROM product 
+WHERE price > (
+SELECT AVG(price) 
+FROM product
+);
+
+-- (Column Subquery) Lấy danh sách thông tin các khách hàng chưa từng đặt bất kỳ đơn hàng nào (Sử dụng toán tử NOT IN kết hợp truy vấn lồng).
+SELECT *
+FROM customer
+WHERE customer_id NOT IN (
+	SELECT customer_id
+    FROM orders
+);
+
+-- (Subquery với hàm tổng hợp) Tìm các phòng ban/danh mục có tổng doanh thu lớn hơn 120% doanh thu trung bình của toàn bộ cửa hàng.
+SELECT category_id, sum(price) AS total_price
+FROM product
+GROUP BY category_id
+HAVING SUM(price) >(
+	SELECT AVG(price)
+    FROM product
+)*1.2;
 
 
+-- (Correlated Subquery) Lấy danh sách các sản phẩm có giá đắt nhất trong từng danh mục (Truy vấn con tham chiếu đến outer query).
+SELECT *
+FROM product p1
+WHERE p1.price IN (
+	SELECT MAX(p2.price)
+    FROM product p2
+    WHERE p1.category_id = p2. category_id
+);
+
+-- (Truy vấn lồng nhiều cấp) Tìm họ tên của các khách hàng VIP đã từng mua sản phẩm thuộc danh mục 'Điện tử' (Sử dụng truy vấn lồng 
+-- từ 3 cấp trở lên thông qua các bảng Customer, Order, Order_Detail, Product, Category).
+
+
+-- lấy ra tên nguòi dùng 
+SELECT full_name
+FROM customer
+WHERE customer_id IN (
+	-- lấy ra id người dùng
+	SELECT customer_id
+	FROM orders
+	WHERE order_id IN (
+		-- lấy ra id đơn hàng 
+		SELECT order_id
+		FROM order_detail
+		WHERE order_detail_id IN (
+			-- lấy ra id chi tiết đơn hàng có chứa sp
+			SELECT order_detail_id
+			FROM order_detail
+			WHERE product_id IN (
+				-- lấy ra id sp thuôc đây
+				SELECT product_id
+				FROM product
+				WHERE category_id IN (
+					-- lấy ra id của đtu
+					SELECT category_id
+					FROM category
+					WHERE category_name = 'Phụ kiện điện tử'
+				)
+			)
+		)
+	)
+)
 
 
